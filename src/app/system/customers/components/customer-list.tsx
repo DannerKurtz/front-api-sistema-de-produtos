@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Table, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { Pencil } from "lucide-react";
+import { Loader2Icon, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import CustomerTable from "./cutomer-table";
 
 interface ICustomers {
 	id: string;
@@ -29,6 +29,8 @@ interface IResponseCustomer {
 
 const CustomerList = () => {
 	const [customerList, setCustomerList] = useState<ICustomers[]>([]);
+	const [viewCustomerMode, setViewCustomerMode] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const fetchCustomers = async () => {
@@ -47,32 +49,40 @@ const CustomerList = () => {
 			console.log("Clientes:", customers);
 			setCustomerList(customers.customerListed);
 		};
-
-		fetchCustomers();
+		fetchCustomers().finally(() => setIsLoading(false));
 	}, []);
 
+	const handleViewCustomer = (view: boolean) => {
+		setViewCustomerMode(view);
+	};
+
 	return (
-		<Table className="w-4xl mx-auto">
-			<TableRow>
-				<TableHead>Nome</TableHead>
-				<TableHead>CPF</TableHead>
-				<TableHead>Telefone</TableHead>
-				<TableHead>Email</TableHead>
-			</TableRow>
-			{customerList.map((customer) => (
-				<TableRow key={customer.id}>
-					<TableCell>{customer.name}</TableCell>
-					<TableCell>{customer.taxId}</TableCell>
-					<TableCell>{customer.phone}</TableCell>
-					<TableCell>{customer.email}</TableCell>
-					<TableCell>
-						<Button size={"icon"} variant={"secondary"}>
-							<Pencil />
-						</Button>
-					</TableCell>
-				</TableRow>
-			))}
-		</Table>
+		<div className="h-full w-full flex flex-col justify-center items-center">
+			<div className="flex flex-col md:flex-row max-w-4xl justify-between items-center">
+				<div className="">search</div>
+				<div>
+					<Button>
+						Novo Cliente <Plus />
+					</Button>
+				</div>
+			</div>
+			{viewCustomerMode ? (
+				<p>Nenhum cliente encontrado.</p>
+			) : (
+				<div className="">
+					{isLoading ? (
+						<div className="h-3/4 absolute flex justify-center items-center animate-spin">
+							<Loader2Icon />
+						</div>
+					) : (
+						<CustomerTable
+							customerList={customerList}
+							handleViewCustomer={handleViewCustomer}
+						/>
+					)}
+				</div>
+			)}
+		</div>
 	);
 };
 
