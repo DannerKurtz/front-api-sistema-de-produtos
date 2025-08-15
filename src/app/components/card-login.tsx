@@ -50,12 +50,14 @@ const CardLogin = () => {
 					name: data.user,
 					password: data.password,
 				}),
+				credentials: "include",
 			});
 			const responseData = await response.json();
 			if (!response.ok)
 				throw new Error(responseData.message || "Erro desconhecido");
 			console.log("Status:", response.status);
 			console.log("Resposta:", responseData);
+			localStorage.setItem("token", responseData.userLoggedIn);
 			router.push("/system");
 		} catch (error) {
 			console.error("Erro na requisição:", error);

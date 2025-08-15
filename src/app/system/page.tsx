@@ -1,5 +1,7 @@
 const SystemPage = () => {
-	return <p>Sistema da page olá</p>;
+	return (
+		<div className="flex flex-col items-center justify-center h-screen"></div>
+	);
 };
 
 export default SystemPage;
