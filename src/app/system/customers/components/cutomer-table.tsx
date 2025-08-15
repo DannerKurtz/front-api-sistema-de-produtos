@@ -29,7 +29,7 @@ interface CustomersProps {
 
 interface CustomerTableProps {
 	customerList: CustomersProps[];
-	handleViewCustomer: (view: boolean) => void;
+	handleViewCustomer: (view: boolean, customer: CustomersProps) => void;
 }
 
 const CustomerTable = ({
@@ -57,7 +57,7 @@ const CustomerTable = ({
 							<Button
 								size={"icon"}
 								variant={"secondary"}
-								onClick={() => handleViewCustomer(true)}
+								onClick={() => handleViewCustomer(true, customer)}
 							>
 								<Pencil />
 							</Button>
