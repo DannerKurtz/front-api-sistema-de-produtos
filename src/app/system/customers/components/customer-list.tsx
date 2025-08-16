@@ -35,16 +35,20 @@ const CustomerList = () => {
 	const [viewCustomerMode, setViewCustomerMode] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [viewerCustomer, setViewerCustomer] = useState<Customers | null>(null);
+	const [searchCustomer, setSearchCustomer] = useState("");
 	useEffect(() => {
 		const token = localStorage.getItem("token");
 		const fetchCustomers = async () => {
-			const response = await fetch("http://localhost:5002/api/customer", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+			const response = await fetch(
+				`http://localhost:5002/api/customer${searchCustomer ? `?name=${searchCustomer}` : ""}`,
+				{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
 				},
-			});
+			);
 
 			if (!response.ok) {
 				console.log("Erro ao buscar clientes:", response.statusText);
@@ -54,7 +58,7 @@ const CustomerList = () => {
 			setCustomerList(customers.customerListed);
 		};
 		fetchCustomers().finally(() => setIsLoading(false));
-	}, [viewCustomerMode]);
+	}, [viewCustomerMode, searchCustomer]);
 
 	const handleViewCustomer = (isVisible: boolean, customer?: Customers) => {
 		setViewCustomerMode(isVisible);
@@ -74,9 +78,13 @@ const CustomerList = () => {
 				/>
 			) : (
 				<div className="h-full w-full flex flex-col justify-center items-center">
-					<div className="flex flex-col md:flex-row max-w-4xl justify-between items-center">
-						<div className="">
-							<Input />
+					<div className="flex flex-col md:flex-row max-w-4xl justify-between items-center gap-6 mt-4">
+						<div className="w-full">
+							<Input
+								placeholder="Pesquisar Clientes"
+								className="w-full"
+								onChange={(e) => setSearchCustomer(e.target.value)}
+							/>
 						</div>
 						<div>
 							<Button onClick={() => handleViewCustomer(true, undefined)}>
