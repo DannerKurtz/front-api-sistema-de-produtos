@@ -75,6 +75,28 @@ const CustomerViewer = ({
 			form.reset(emptyCustomer);
 		}
 	}, [customer, form]);
+	const handleDeleteCustomer = async () => {
+		const token = localStorage.getItem("token");
+		if (!customer?.id) return;
+		if (window.confirm("Você tem certeza que deseja deletar este cliente?")) {
+			await fetch(`http://localhost:5002/api/customer/${customer.id}`, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+			})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error("Erro ao deletar cliente");
+					}
+					handleViewCustomer(false);
+				})
+				.catch((error) => {
+					console.error("Erro na requisição:", error);
+				});
+		}
+	};
 	const onSubmit = async (values: formValues) => {
 		const token = localStorage.getItem("token");
 		console.log("Iniciando submit com valores:", values);
@@ -348,7 +370,12 @@ const CustomerViewer = ({
 							</div>
 						</CardContent>
 						<CardFooter className="w-full flex justify-between pb-6">
-							<Button type="button" size={"lg"} variant={"destructive"}>
+							<Button
+								type="button"
+								size={"lg"}
+								variant={"destructive"}
+								onClick={handleDeleteCustomer}
+							>
 								Deletar
 							</Button>
 							<Button type="submit" size={"lg"}>
