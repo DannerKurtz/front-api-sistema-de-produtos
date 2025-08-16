@@ -9,30 +9,38 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import z from "zod";
 
-interface Customers {
-	id: string;
-	name: string;
-	postalCode: string;
-	city: string;
-	taxId: string;
-	stateRegistration: string;
-	address: string;
-	neighborhood: string;
-	addressNumber: string;
-	contactName: string;
-	phone: string;
-	mobile: string;
-	email: string;
-	createdAt?: Date;
-	updatedAt?: Date;
-}
-
-const emptyCustomer: Customers = {
-	id: "",
+const customersSchema = z.object({
+	id: z.string().optional(),
+	name: z
+		.string()
+		.trim()
+		.min(1, "O campo nome da empresa/cliente é obrigatório"),
+	postalCode: z.string().trim().min(1, "O campo CEP é obrigatório"),
+	city: z.string().trim().min(1, "O campo cidade é obrigatório"),
+	taxId: z.string().trim().min(1, "O campo CNPJ/CPF é obrigatório"),
+	stateRegistration: z
+		.string()
+		.trim()
+		.min(1, "O campo Inscrição Estadual é obrigatório"),
+	address: z.string().trim().min(1, "O campo endereço é obrigatório"),
+	neighborhood: z.string().trim().min(1, "O campo bairro é obrigatório"),
+	addressNumber: z.string().trim().min(1, "O campo número é obrigatório"),
+	contactName: z
+		.string()
+		.trim()
+		.min(1, "O campo nome do contato é obrigatório"),
+	phone: z.string().min(1, "O campo telefone é obrigatório"),
+	mobile: z.string().min(1, "O campo celular é obrigatório"),
+	email: z.email("O campo e-mail é obrigatório"),
+});
+type formValues = z.infer<typeof customersSchema>;
+const emptyCustomer: formValues = {
 	name: "",
 	postalCode: "",
 	city: "",
@@ -48,7 +56,7 @@ const emptyCustomer: Customers = {
 };
 
 interface CustomerViewProps {
-	customer?: Customers;
+	customer?: formValues;
 	handleViewCustomer: (isVisible: boolean) => void;
 }
 
@@ -56,51 +64,97 @@ const CustomerViewer = ({
 	customer,
 	handleViewCustomer,
 }: CustomerViewProps) => {
-	const form = useForm<Customers>({
+	const form = useForm<formValues>({
+		resolver: zodResolver(customersSchema),
 		defaultValues: emptyCustomer,
 	});
 	useEffect(() => {
 		if (customer) {
-			form.reset(customer); // Modo edição
+			form.reset(customer);
 		} else {
-			form.reset(emptyCustomer); // Modo criação
+			form.reset(emptyCustomer);
 		}
-	}, [customer, form.reset]);
-	const onSubmit = async () => {
+	}, [customer, form]);
+	const onSubmit = async (values: formValues) => {
+		const token = localStorage.getItem("token");
+		console.log("Iniciando submit com valores:", values);
 		try {
-			const response = await fetch("http://localhost:5002/api/user/login", {
-				method: "POST",
+			const url = `http://localhost:5002/api/customer${customer?.id ? `/${customer.id}` : ""}`;
+			const method = customer?.id ? "PUT" : "POST";
+			const body = {
+				name: values.name,
+				postalCode: values.postalCode,
+				city: values.city,
+				taxId: values.taxId,
+				stateRegistration: values.stateRegistration,
+				address: values.address,
+				neighborhood: values.neighborhood,
+				addressNumber: values.addressNumber,
+				contactName: values.contactName,
+				phone: values.phone,
+				mobile: values.mobile,
+				email: values.email,
+			};
+
+			const response = await fetch(url, {
+				method: method,
 				headers: {
 					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({}),
+				body: JSON.stringify(body),
 				credentials: "include",
+				mode: "cors",
 			});
-			const responseData = await response.json();
-			if (!response.ok)
-				throw new Error(responseData.message || "Erro desconhecido");
-			console.log("Status:", response.status);
-			console.log("Resposta:", responseData);
-			localStorage.setItem("token", responseData.userLoggedIn);
+
+			if (!response.ok) {
+				const errorData = await response.text();
+				console.error("Erro da API:", errorData);
+				throw new Error(errorData || "Erro desconhecido");
+			}
+
+			if (response.ok) {
+				handleViewCustomer(false);
+			}
 		} catch (error) {
 			console.error("Erro na requisição:", error);
+
+			if (error instanceof TypeError && error.message === "Failed to fetch") {
+				console.error(
+					"Erro de conexão com a API. Verifique se o servidor está rodando em http://localhost:5002",
+				);
+			}
+
+			if (error instanceof Error) {
+				console.error("Detalhes do erro:", {
+					message: error.message,
+					name: error.name,
+					stack: error.stack,
+				});
+			}
 		}
 	};
 	return (
-		<div className="w-full  flex flex-col justify-center items-center p-6">
-			<Form {...form}>
-				<div className="w-4xl h- flex flex-col justify-center items-center border-solid border-2 border-blue-500 rounded-lg space-x-1">
-					<div className="flex justify-end w-full p-4">
-						<Button
-							size={"icon"}
-							variant={"secondary"}
-							onClick={() => handleViewCustomer(false)}
-						>
-							<X />
-						</Button>
-					</div>
+		<div className="w-full flex flex-col justify-center items-center p-6">
+			<div className="w-4xl h- flex flex-col justify-center items-center border-solid border-2 border-blue-500 rounded-lg space-x-1">
+				<div className="flex justify-end w-full p-4">
+					<Button
+						size={"icon"}
+						variant={"secondary"}
+						onClick={() => handleViewCustomer(false)}
+					>
+						<X />
+					</Button>
+				</div>
+				<Form {...form}>
 					<form
-						onSubmit={form.handleSubmit(onSubmit)}
+						onSubmit={(e) => {
+							e.preventDefault();
+							console.log("Form submit event triggered");
+							console.log("Form values:", form.getValues());
+							console.log("Form errors:", form.formState.errors);
+							form.handleSubmit(onSubmit)(e);
+						}}
 						className="space-y-8 flex flex-col justify-center items-center"
 					>
 						<CardContent className="flex flex-col h-full justify-center items-center ">
@@ -302,10 +356,9 @@ const CustomerViewer = ({
 							</Button>
 						</CardFooter>
 					</form>
-				</div>
-			</Form>
+				</Form>
+			</div>
 		</div>
 	);
 };
-
 export default CustomerViewer;

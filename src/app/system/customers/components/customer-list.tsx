@@ -1,6 +1,8 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Loader2Icon, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import CustomerViewer from "./customer-viewer";
@@ -52,12 +54,14 @@ const CustomerList = () => {
 			setCustomerList(customers.customerListed);
 		};
 		fetchCustomers().finally(() => setIsLoading(false));
-	}, []);
+	}, [viewCustomerMode]);
 
 	const handleViewCustomer = (isVisible: boolean, customer?: Customers) => {
 		setViewCustomerMode(isVisible);
 		if (customer) {
 			setViewerCustomer(customer);
+		} else {
+			setViewerCustomer(null);
 		}
 	};
 
@@ -71,7 +75,9 @@ const CustomerList = () => {
 			) : (
 				<div className="h-full w-full flex flex-col justify-center items-center">
 					<div className="flex flex-col md:flex-row max-w-4xl justify-between items-center">
-						<div className="">search</div>
+						<div className="">
+							<Input />
+						</div>
 						<div>
 							<Button onClick={() => handleViewCustomer(true, undefined)}>
 								Novo Cliente <Plus />
