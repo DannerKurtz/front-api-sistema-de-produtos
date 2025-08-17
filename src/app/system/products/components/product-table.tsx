@@ -17,11 +17,16 @@ interface ProductProps {
 	quantity: number;
 	weight?: number;
 	costPrice?: number;
-	rawMaterialProductRelation?: {
-		id: string;
-		productId: string;
-		rawMaterialId: string;
+	rawMaterialProductRelation: {
 		rawMaterialQuantity: number;
+		rawMaterial: {
+			id: string;
+			productId: string;
+			rawMaterialId: string;
+			rawMaterialQuantity: number;
+			createdAt?: Date;
+			updatedAt?: Date;
+		};
 	}[];
 	createdAt?: Date;
 	updatedAt?: Date;

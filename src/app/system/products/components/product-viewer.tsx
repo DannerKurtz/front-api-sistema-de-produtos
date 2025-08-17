@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import RawMaterialViewerTable from "./raw-material-view-table";
 
 const productSchema = z.object({
 	id: z.string().optional(),
@@ -103,11 +104,34 @@ const emptyProduct: formValues = {
 	rawMaterialProductRelation: [],
 };
 
+interface ProductProps {
+	id: string;
+	name: string;
+	percentage?: number;
+	price?: number;
+	quantity: number;
+	weight?: number;
+	costPrice?: number;
+	rawMaterialProductRelation:
+		| {
+				rawMaterialQuantity: number;
+				rawMaterial: {
+					id: string;
+					name: string;
+					price: number;
+					unitWeight: number;
+					createdAt?: Date;
+					updatedAt?: Date;
+				};
+		  }[]
+		| undefined;
+	createdAt?: Date;
+	updatedAt?: Date;
+}
 interface ProductViewerProps {
-	product?: formValues;
+	product?: ProductProps;
 	handleViewProduct: (isVisible: boolean) => void;
 }
-
 const ProductViewer = ({ product, handleViewProduct }: ProductViewerProps) => {
 	const form = useForm<formValues>({
 		resolver: zodResolver(productSchema),
@@ -195,6 +219,7 @@ const ProductViewer = ({ product, handleViewProduct }: ProductViewerProps) => {
 			}
 		}
 	};
+	console.log("relações: ", product?.rawMaterialProductRelation);
 	return (
 		<div className="w-full flex flex-col justify-center items-center p-6">
 			<div className="w-4xl h- flex flex-col justify-center items-center border-solid border-2 border-blue-500 rounded-lg space-x-1">
@@ -267,6 +292,54 @@ const ProductViewer = ({ product, handleViewProduct }: ProductViewerProps) => {
 											<FormMessage />
 										</FormItem>
 									)}
+								/>
+								<FormField
+									control={form.control}
+									name="price"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Preço</FormLabel>
+											<FormControl>
+												<Input
+													placeholder="Preço"
+													{...field}
+													type="text"
+													readOnly
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="weight"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Peso Total</FormLabel>
+											<FormControl>
+												<Input
+													placeholder="Peso Total"
+													{...field}
+													type="text"
+													readOnly
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+							<div>
+								<Input placeholder="Pesquisar o material" />
+								<Button>
+									Adicionar <Plus />
+								</Button>
+
+								<RawMaterialViewerTable
+									rawMaterialProductRelation={
+										product?.rawMaterialProductRelation || []
+									}
 								/>
 							</div>
 						</CardContent>
