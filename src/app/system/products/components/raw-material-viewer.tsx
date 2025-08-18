@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
+import RawMaterialSearch from "./raw-material-serach";
 import RawMaterialViewerTable from "./raw-material-view-table";
 
 interface rawMaterialProductRelationProps {
@@ -25,7 +25,9 @@ const RawMaterialViewer = ({
 		<div className="flex flex-col justify-center items-center gap-4 m-2.5">
 			<h2 className="text-2xl font-semibold">Materiais Utilizado</h2>
 			<div className="flex justify-between items-center w-2xl">
-				<div></div>
+				<div>
+					<RawMaterialSearch />
+				</div>
 				<Button>
 					Adicionar <Plus />
 				</Button>
