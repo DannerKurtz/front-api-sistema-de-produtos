@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import RawMaterialViewerTable from "./raw-material-view-table";
+import RawMaterialViewer from "./raw-material-viewer";
 
 const productSchema = z.object({
 	id: z.string().optional(),
@@ -243,9 +243,9 @@ const ProductViewer = ({ product, handleViewProduct }: ProductViewerProps) => {
 						}}
 						className="space-y-8 flex flex-col justify-center items-center"
 					>
-						<CardContent className="flex flex-col h-full justify-center items-center ">
-							<h2 className="text-2xl font-bold pb-4">Dados do material</h2>
-							<div className="flex justify-center space-x-6 ">
+						<CardContent className="flex flex-col h-full w-2xl justify-center items-center ">
+							<h2 className="text-2xl font-bold pb-4">Dados do produto</h2>
+							<div className="flex justify-center space-x-6  items-center">
 								<FormField
 									control={form.control}
 									name="name"
@@ -331,12 +331,7 @@ const ProductViewer = ({ product, handleViewProduct }: ProductViewerProps) => {
 								/>
 							</div>
 							<div>
-								<Input placeholder="Pesquisar o material" />
-								<Button>
-									Adicionar <Plus />
-								</Button>
-
-								<RawMaterialViewerTable
+								<RawMaterialViewer
 									rawMaterialProductRelation={
 										product?.rawMaterialProductRelation || []
 									}

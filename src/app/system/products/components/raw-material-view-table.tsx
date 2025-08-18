@@ -7,7 +7,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Pencil } from "lucide-react";
+import { Eraser } from "lucide-react";
 
 interface rawMaterialProductRelationProps {
 	rawMaterialQuantity: number;
@@ -52,7 +52,7 @@ const RawMaterialViewerTable = ({
 										variant={"secondary"}
 										onClick={() => {}}
 									>
-										<Pencil />
+										<Eraser />
 									</Button>
 								</TableCell>
 							</TableRow>
