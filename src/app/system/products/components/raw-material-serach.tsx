@@ -28,11 +28,22 @@ interface RawMaterialProps {
 	updatedAt?: Date;
 }
 
+interface RawMaterialProductRelationProps {
+	rawMaterialQuantity: number;
+	rawMaterial: RawMaterialProps;
+}
+
 interface RawMaterialSearchProps {
 	rawMaterialListed: RawMaterialProps[];
 }
 
-const RawMaterialSearch = () => {
+interface HandleRawMaterialSelect {
+	handleRawMaterialSelect: (props: RawMaterialProductRelationProps) => void;
+}
+
+const RawMaterialSearch = ({
+	handleRawMaterialSelect,
+}: HandleRawMaterialSelect) => {
 	const [open, setOpen] = useState(false);
 	const [inputValue, setInputValue] = useState("");
 	const [selectedValue, setSelectedValue] = useState("");
@@ -84,6 +95,12 @@ const RawMaterialSearch = () => {
 										setSelectedValue(val);
 										setInputValue("");
 										setOpen(false);
+										handleRawMaterialSelect({
+											rawMaterial: rawMaterial?.rawMaterialListed.find(
+												(item) => item.name === selectedValue,
+											) || { id: "", name: "", price: 0, unitWeight: 0 },
+											rawMaterialQuantity: 0,
+										});
 									}}
 								>
 									{item.name}

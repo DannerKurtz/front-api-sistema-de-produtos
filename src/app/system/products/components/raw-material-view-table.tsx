@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/table";
 import { Eraser } from "lucide-react";
 
-interface rawMaterialProductRelationProps {
-	rawMaterialQuantity: number;
+interface RawMaterialProductRelationProps {
+	rawMaterialQuantity?: number;
 	rawMaterial: {
 		id: string;
 		name: string;
@@ -22,7 +22,7 @@ interface rawMaterialProductRelationProps {
 }
 
 interface RawMaterialProps {
-	rawMaterialProductRelation: rawMaterialProductRelationProps[] | undefined;
+	rawMaterialProductRelation: RawMaterialProductRelationProps[] | undefined;
 }
 
 const RawMaterialViewerTable = ({
